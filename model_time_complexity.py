@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[12]:
+# In[4]:
 
 #estimating the time complexity of the thermal modeling using the time module
 
@@ -13,12 +13,11 @@ from thermal_model import run_simulation
 num_times = 10
 max_time = 0.25 #days
 
-time_space = np.linspace(0, max_times, num=num_times) 
+time_space = np.linspace(0, max_time, num=num_times) 
 results = []
-print(time_space)
 for days in time_space:
     then = time.time()
-    run_simulation(days, graph=False)
+    run_simulation(days, graphing=False)
     now = time.time()
     results.append(now - then)
     
@@ -28,18 +27,6 @@ ylabel("time elapsed for simulation")
     
 
 
-
-# In[10]:
-
-import time
-
-
-# In[13]:
-
-import matplotlib.pyplot as plt
-
-
-# 
 
 # In[ ]:
 

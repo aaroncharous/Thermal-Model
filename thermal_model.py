@@ -604,21 +604,6 @@ if __name__=="__main__":
     run_simulation(days)
 
 
-# In[20]:
-
-len(Led)
-
-
-# In[30]:
-
-fig17 = pyplot.figure()
-ax17 = fig17.add_subplot(111)
-ax17.plot(times[3000:4000], Led[3000:4000], label='LED')
-ax17.legend(loc='upper left')
-ax17.set_xlabel('time / min')
-ax17.set_ylabel('$T$ / K')
-
-
 # In[ ]:
 
 
