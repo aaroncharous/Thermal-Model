@@ -44,6 +44,7 @@ Modeling written by Finn van Krieken, Aaron Charous, and Eddie Williams
 
 from scipy.integrate import odeint
 import numpy as np
+from matplotlib import pyplot
 
 
 ''' CONSTANTS '''
@@ -477,9 +478,6 @@ def run_simulation(days, graphing=True):
         Battery = answer[:, 13]
         Sink = answer[:, 14]
         Driver = answer[:, 15]
-
-        from matplotlib import pyplot
-        get_ipython().magic('matplotlib inline')
         fig = pyplot.figure()
         ax = fig.add_subplot(111)
         ax.plot(times, Cell2, label='Cell2')
@@ -597,6 +595,7 @@ def run_simulation(days, graphing=True):
         ax20.set_xlabel('time / min')
         ax20.set_ylabel('$T$ / K')
         full_output = 1  ## this makes it keep running no matter how long it takes (because the odeint solver can take a bit)
+        pyplot.show()
         
 if __name__=="__main__":
     #default behavior
@@ -604,7 +603,6 @@ if __name__=="__main__":
     run_simulation(days)
 
 
-# In[ ]:
 
 
 
