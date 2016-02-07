@@ -15,7 +15,8 @@ for days in time_space:
     run_simulation(days, graphing=False)
     now = time.time()
     results.append(now - then)
-    print("simulation completed")
+    print("simulation completed for days: " + str(days))
+    print("Time: " + str(now - then))
     
 plt.plot(time_space, results)
 xlabel("time in days")

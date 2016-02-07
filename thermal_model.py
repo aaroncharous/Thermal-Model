@@ -187,6 +187,9 @@ phaseshift = 0                     ##  Minutes into orbit (with zero being direc
                                    ##  at 46 minutes, it would be exactly in the middle of its eclipse and back at the equator
 
 
+#adjusting simulation accuracy to increase performance
+rtol=1.5*10**(-4) #default val is 1.5*10**(-8)
+
 ''' FUNCTIONS '''
 
 
@@ -431,7 +434,7 @@ def connect(y0, t0, end_time):
     if end_time < stop_time:
         stop_time = end_time + 1/1200
     orbittimes = np.linspace(start=t0, stop=stop_time, num=60*(stop_time - t0)*20)
-    sol = odeint(func=dy_dt, y0=y0, t=orbittimes)
+    sol = odeint(func=dy_dt, y0=y0, t=orbittimes, rtol=rtol)
     return sol, stop_time, sol[len(sol) - 1]
 
 def runconnect(num_days, y0s):
