@@ -1,4 +1,4 @@
-
+#
 # coding: utf-8
 
 # In[16]:
@@ -24,9 +24,9 @@ download Anaconda Launcher which has iPython Notebook built in, and you can run 
 browser you want. This uses numpy, which is pretty well documented if you need other mathematical functions (just
 remember you have to enter them as np.func(x) rather than just func(x))
 
-Happy modelling!
+Happy modeling!
 
-Modelling written by Finn van Krieken, Aaron Charous, and Eddie Williams
+Modeling written by Finn van Krieken, Aaron Charous, and Eddie Williams
 '''
 
 
@@ -51,7 +51,7 @@ from matplotlib import pyplot
 
 
 ## Printed Circuit Board (Face)
-PCB_abs = .90                      ##  Absorbence
+PCB_abs = .90                      ##  Absorbance
 PCB_emis = .90                     ##  Emissivity
 PCB_area = 0.01091875              ##  Area -- check this!  GUESS!                    m^2
 PCB_thickness = 0.00157            ##  guess Thickness         m
@@ -66,7 +66,7 @@ PCB_cond = .44                     ##  Thermal conductivity W m^-1 K^-1
 
 ## NOTE: These are the old cells that stopped being produced. This will need to be updated
 
-cell_abs = 0.92                    ##  Absorbence
+cell_abs = 0.92                    ##  Absorbance
 cell_emis = 0.85                   ##  Emissivity
 cell_area = 0.000236207            ##  Area                    m^2
 cell_area_eff = 0.0002277          ##  Working Area            m^2
@@ -126,7 +126,7 @@ driver_area_chassis = 0.00057148   ##  Area with chassis
 driver_weight = 0.055786          ##  guess Weight   kg
 driver_c = 950                    ##  Spec. heat capacity     J/kgK
 driver_C = driver_weight*driver_c ##  Heat capacity           J/K
-regulator_power = 064             ## Watts -- kind of a guess
+regulator_power = 0.64             ## Watts -- kind of a guess
 mofset_power = 68.694             ## Watts
 inductor_power = 6.655            ## Watts
 diode_power = 26                  ## Watts
@@ -191,9 +191,6 @@ phaseshift = 0                     ##  Minutes into orbit (with zero being direc
                                    ##  at 46 minutes, it would be exactly in the middle of its eclipse and back at the equator
 
 
-#adjusting simulation accuracy to increase performance
-rtol=1.5*10**(-4) #default val is 1.5*10**(-8)
-
 ''' FUNCTIONS '''
 
 
@@ -222,9 +219,9 @@ def solar(t):               ##  W m^-2
 def albedo(t):              ##  W m^-2
     return solar(t)*albedofactor
 
-## flash: estimate of heat dissipated from flash panel (assumed to enter flash panel uniformly)
+## flash: estimate of heat dissapated from flash panel (assumed to enter flash panel uniformly)
 ## Inputs: t, time in minutes
-## Output: energy dissipated by flash, 3 flashes per orbit when in eclipse.
+## Output: energy dissapated by flash, 3 flashes per orbit when in eclipse.
 def flash(t):                    ## W
     realT = t%period
     if (46.0 < realT <= (46+flash_time/60.)) | (47.0 < realT <= (47+flash_time/60.)) | (48.0 < realT <= (48+flash_time/60.)) :
@@ -430,7 +427,7 @@ def dy_dt(y, t):
     dydt = [dLed_dt, dCell2_dt, dCell3_dt, dCell4_dt, dCell5_dt, dCell6_dt, dFace1_dt, dFace2_dt, dFace3_dt, dFace4_dt, dFace5_dt, dFace6_dt, dChassis_dt, dBattery_dt, dSink_dt, dDriver_dt]  # Pack the answer.
     return dydt
 
-def connect(y0, t0, end_time):
+def connect(y0, t0, end_time, rtol):
     if eclipse(t0):
         stop_time = t0 + eclipse_time
     else:
@@ -441,13 +438,13 @@ def connect(y0, t0, end_time):
     sol = odeint(func=dy_dt, y0=y0, t=orbittimes, rtol=rtol)
     return sol, stop_time, sol[len(sol) - 1]
 
-def runconnect(num_days, y0s):
+def runconnect(num_days, y0s, rtol):
     end_time = num_days * 24 * 60
-    previous_sol, stop_time, last_val = connect(y0s, 0, end_time)
+    previous_sol, stop_time, last_val = connect(y0s, 0, end_time, rtol)
     print(len(previous_sol[:,0]))
     combined_solution = previous_sol
     while end_time > stop_time:
-        previous_sol, stop_time, last_val = connect(last_val, stop_time, end_time)
+        previous_sol, stop_time, last_val = connect(last_val, stop_time, end_time, rtol)
         print(len(previous_sol[:,0]))
         combined_solution = np.concatenate((combined_solution, previous_sol), axis = 0)
         
@@ -455,13 +452,13 @@ def runconnect(num_days, y0s):
 
 #function for executing the entire simulation for a given number of days
 #used for estimating time complexity of simulation
-def run_simulation(days, graphing=True):
+def run_simulation(days, rtol, graphing=True):
     y0s = np.zeros(16)
     for i in range(0, 16):
         y0s[i] = 300.           ## estimate for average psuedo steady-state temperature
     times = np.linspace(start=0., stop=24*60*days, num=24*60*days*60*20) ## (starting time, stopping time, number of increments)
     #answer = odeint(func=dy_dt, y0=y0s, t=times) 
-    answer = runconnect(days, y0s)
+    answer = runconnect(days, y0s, rtol)
     print(len(times))
     print(len(answer[:,0]))
     if len(times) < len(answer[:,0]):
@@ -487,6 +484,7 @@ def run_simulation(days, graphing=True):
         Driver = answer[:, 15]
         fig = pyplot.figure()
         ax = fig.add_subplot(111)
+        ax.set_title('error:' + str(rtol))
         ax.plot(times, Cell2, label='Cell2')
         ax.plot(times, Cell3, label='Cell3')
         ax.plot(times, Cell4, label='Cell4')
@@ -502,114 +500,115 @@ def run_simulation(days, graphing=True):
         ax.plot(times, Battery, label = 'Battery')
         ax.plot(times, Sink, label = 'Sink')
         ax.plot(times, Driver, label = 'Driver')
-        ax.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3)
+        ax.legend(loc = 'upper left')
         ax.set_xlabel('time / min')
         ax.set_ylabel('$T$ / K')
-        fig1 = pyplot.figure()
-        ax = fig1.add_subplot(111)
-        ax.plot(times, Chassis, label='Chassis')
-        ax.legend(loc='upper left')
-        ax.set_xlabel('time / min')
-        ax.set_ylabel('$T$ / K')
-        fig2 = pyplot.figure()
-        ax2 = fig2.add_subplot(111)
-        ax2.plot(times, Cell2, label='Cell2')
-        ax2.legend(loc='upper left')
-        ax2.set_xlabel('time / min')
-        ax2.set_ylabel('$T$ / K')
-        fig3 = pyplot.figure()
-        ax3 = fig3.add_subplot(111)
-        ax3.plot(times, Cell3, label='Cell3')
-        ax3.legend(loc='upper left')
-        ax3.set_xlabel('time / min')
-        ax3.set_ylabel('$T$ / K')
-        fig4 = pyplot.figure()
-        ax4 = fig4.add_subplot(111)
-        ax4.plot(times, Cell4, label='Cell4')
-        ax4.legend(loc='upper left')
-        ax4.set_xlabel('time / min')
-        ax4.set_ylabel('$T$ / K')
-        fig5 = pyplot.figure()
-        ax5 = fig5.add_subplot(111)
-        ax5.plot(times, Cell5, label='Cell5')
-        ax5.legend(loc='upper left')
-        ax5.set_xlabel('time / min')
-        ax5.set_ylabel('$T$ / K')
-        fig6 = pyplot.figure()
-        ax6 = fig6.add_subplot(111)
-        ax6.plot(times, Cell6, label='Cell6')
-        ax6.legend(loc='upper left')
-        ax6.set_xlabel('time / min')
-        ax6.set_ylabel('$T$ / K')
-        fig11 = pyplot.figure()
-        ax11 = fig11.add_subplot(111)
-        ax11.plot(times, Face1, label='Face1')
-        ax11.legend(loc='upper left')
-        ax11.set_xlabel('time / min')
-        ax11.set_ylabel('$T$ / K')
-        fig12 = pyplot.figure()
-        ax12 = fig12.add_subplot(111)
-        ax12.plot(times, Face2, label='Face2')
-        ax12.legend(loc='upper left')
-        ax12.set_xlabel('time / min')
-        ax12.set_ylabel('$T$ / K')
-        fig13 = pyplot.figure()
-        ax13 = fig13.add_subplot(111)
-        ax13.plot(times, Face3, label='Face3')
-        ax13.legend(loc='upper left')
-        ax13.set_xlabel('time / min')
-        ax13.set_ylabel('$T$ / K')
-        fig14 = pyplot.figure()
-        ax14 = fig14.add_subplot(111)
-        ax14.plot(times, Face4, label='Face4')
-        ax14.legend(loc='upper left')
-        ax14.set_xlabel('time / min')
-        ax14.set_ylabel('$T$ / K')
-        fig15 = pyplot.figure()
-        ax15 = fig15.add_subplot(111)
-        ax15.plot(times, Face5, label='Face5')
-        ax15.legend(loc='upper left')
-        ax15.set_xlabel('time / min')
-        ax15.set_ylabel('$T$ / K')
-        fig16 = pyplot.figure()
-        ax16 = fig16.add_subplot(111)
-        ax16.plot(times, Face6, label='Face6')
-        ax16.legend(loc='upper left')
-        ax16.set_xlabel('time / min')
-        ax16.set_ylabel('$T$ / K')
-        fig17 = pyplot.figure()
-        ax17 = fig17.add_subplot(111)
-        ax17.plot(times, Led, label='LED')
-        ax17.legend(loc='upper left')
-        ax17.set_xlabel('time / min')
-        ax17.set_ylabel('$T$ / K')
-        fig18 = pyplot.figure()
-        ax18 = fig18.add_subplot(111)
-        ax18.plot(times, Battery, label='Battery')
-        ax18.legend(loc='upper left')
-        ax18.set_xlabel('time / min')
-        ax18.set_ylabel('$T$ / K')
-        fig19 = pyplot.figure()
-        ax19 = fig19.add_subplot(111)
-        ax19.plot(times, Battery, label='Sink')
-        ax19.legend(loc='upper left')
-        ax19.set_xlabel('time / min')
-        ax19.set_ylabel('$T$ / K')
-        fig20 = pyplot.figure()
-        ax20 = fig20.add_subplot(111)
-        ax20.plot(times, Battery, label='Driver')
-        ax20.legend(loc='upper left')
-        ax20.set_xlabel('time / min')
-        ax20.set_ylabel('$T$ / K')
+        #fig1 = pyplot.figure()
+        #ax = fig1.add_subplot(111)
+        #ax.plot(times, Chassis, label='Chassis')
+        #ax.legend(loc='upper left')
+        #ax.set_xlabel('time / min')
+        #ax.set_ylabel('$T$ / K')
+        #fig2 = pyplot.figure()
+        #ax2 = fig2.add_subplot(111)
+        #ax2.plot(times, Cell2, label='Cell2')
+        #ax2.legend(loc='upper left')
+        #ax2.set_xlabel('time / min')
+        #ax2.set_ylabel('$T$ / K')
+        #fig3 = pyplot.figure()
+        #ax3 = fig3.add_subplot(111)
+        #ax3.plot(times, Cell3, label='Cell3')
+        #ax3.legend(loc='upper left')
+        #ax3.set_xlabel('time / min')
+        #ax3.set_ylabel('$T$ / K')
+        #fig4 = pyplot.figure()
+        #ax4 = fig4.add_subplot(111)
+        #ax4.plot(times, Cell4, label='Cell4')
+        #ax4.legend(loc='upper left')
+        #ax4.set_xlabel('time / min')
+        #ax4.set_ylabel('$T$ / K')
+        #fig5 = pyplot.figure()
+        #ax5 = fig5.add_subplot(111)
+        #ax5.plot(times, Cell5, label='Cell5')
+        #ax5.legend(loc='upper left')
+        #ax5.set_xlabel('time / min')
+        #ax5.set_ylabel('$T$ / K')
+        #fig6 = pyplot.figure()
+        #ax6 = fig6.add_subplot(111)
+        #ax6.plot(times, Cell6, label='Cell6')
+        #ax6.legend(loc='upper left')
+        #ax6.set_xlabel('time / min')
+        #ax6.set_ylabel('$T$ / K')
+        #fig11 = pyplot.figure()
+        #ax11 = fig11.add_subplot(111)
+        #ax11.plot(times, Face1, label='Face1')
+        #ax11.legend(loc='upper left')
+        #ax11.set_xlabel('time / min')
+        #ax11.set_ylabel('$T$ / K')
+        #fig12 = pyplot.figure()
+        #ax12 = fig12.add_subplot(111)
+        #ax12.plot(times, Face2, label='Face2')
+        #ax12.legend(loc='upper left')
+        #ax12.set_xlabel('time / min')
+        #ax12.set_ylabel('$T$ / K')
+        #fig13 = pyplot.figure()
+        #ax13 = fig13.add_subplot(111)
+        #ax13.plot(times, Face3, label='Face3')
+        #ax13.legend(loc='upper left')
+        #ax13.set_xlabel('time / min')
+        #ax13.set_ylabel('$T$ / K')
+        #fig14 = pyplot.figure()
+        #ax14 = fig14.add_subplot(111)
+        #ax14.plot(times, Face4, label='Face4')
+        #ax14.legend(loc='upper left')
+        #ax14.set_xlabel('time / min')
+        #ax14.set_ylabel('$T$ / K')
+        #fig15 = pyplot.figure()
+        #ax15 = fig15.add_subplot(111)
+        #ax15.plot(times, Face5, label='Face5')
+        #ax15.legend(loc='upper left')
+        #ax15.set_xlabel('time / min')
+        #ax15.set_ylabel('$T$ / K')
+        #fig16 = pyplot.figure()
+        #ax16 = fig16.add_subplot(111)
+        #ax16.plot(times, Face6, label='Face6')
+        #ax16.legend(loc='upper left')
+        #ax16.set_xlabel('time / min')
+        #ax16.set_ylabel('$T$ / K')
+        #fig17 = pyplot.figure()
+        #ax17 = fig17.add_subplot(111)
+        #ax17.plot(times, Led, label='LED')
+        #ax17.legend(loc='upper left')
+        #ax17.set_xlabel('time / min')
+        #ax17.set_ylabel('$T$ / K')
+        #fig18 = pyplot.figure()
+        #ax18 = fig18.add_subplot(111)
+        #ax18.plot(times, Battery, label='Battery')
+        #ax18.legend(loc='upper left')
+        #ax18.set_xlabel('time / min')
+        #ax18.set_ylabel('$T$ / K')
+        #fig19 = pyplot.figure()
+        #ax19 = fig19.add_subplot(111)
+        #ax19.plot(times, Battery, label='Sink')
+        #ax19.legend(loc='upper left')
+        #ax19.set_xlabel('time / min')
+        #ax19.set_ylabel('$T$ / K')
+        #fig20 = pyplot.figure()
+        #ax20 = fig20.add_subplot(111)
+        #ax20.plot(times, Battery, label='Driver')
+        #ax20.legend(loc='upper left')
+        #ax20.set_xlabel('time / min')
+        #ax20.set_ylabel('$T$ / K')
         full_output = 1  ## this makes it keep running no matter how long it takes (because the odeint solver can take a bit)
         pyplot.show()
         
 if __name__=="__main__":
-    #default behaviour
-    days = .025 ## specify number of days that the odeint should run. Keep in under 0.5 if you want reasonable run time
-    run_simulation(days)
+    #default behavior
+    days = .01 ## specify number of days that the odeint should run. Keep in under 0.5 if you want reasonable run time
 
+    #adjusting simulation accuracy to increase performance
+    rtol=10**(-8) #default val is 1.5*10**(-8)
 
-
+    run_simulation(days, rtol)
 
 
