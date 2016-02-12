@@ -24,9 +24,9 @@ download Anaconda Launcher which has iPython Notebook built in, and you can run 
 browser you want. This uses numpy, which is pretty well documented if you need other mathematical functions (just
 remember you have to enter them as np.func(x) rather than just func(x))
 
-Happy modeling!
+Happy modelling!
 
-Modeling written by Finn van Krieken, Aaron Charous, and Eddie Williams
+Modelling written by Finn van Krieken, Aaron Charous, and Eddie Williams
 '''
 
 
@@ -51,7 +51,7 @@ from matplotlib import pyplot
 
 
 ## Printed Circuit Board (Face)
-PCB_abs = .90                      ##  Absorbance
+PCB_abs = .90                      ##  Absorbence
 PCB_emis = .90                     ##  Emissivity
 PCB_area = 0.01091875              ##  Area -- check this!  GUESS!                    m^2
 PCB_thickness = 0.00157            ##  guess Thickness         m
@@ -66,7 +66,7 @@ PCB_cond = .44                     ##  Thermal conductivity W m^-1 K^-1
 
 ## NOTE: These are the old cells that stopped being produced. This will need to be updated
 
-cell_abs = 0.92                    ##  Absorbance
+cell_abs = 0.92                    ##  Absorbence
 cell_emis = 0.85                   ##  Emissivity
 cell_area = 0.000236207            ##  Area                    m^2
 cell_area_eff = 0.0002277          ##  Working Area            m^2
@@ -222,9 +222,9 @@ def solar(t):               ##  W m^-2
 def albedo(t):              ##  W m^-2
     return solar(t)*albedofactor
 
-## flash: estimate of heat dissapated from flash panel (assumed to enter flash panel uniformly)
+## flash: estimate of heat dissipated from flash panel (assumed to enter flash panel uniformly)
 ## Inputs: t, time in minutes
-## Output: energy dissapated by flash, 3 flashes per orbit when in eclipse.
+## Output: energy dissipated by flash, 3 flashes per orbit when in eclipse.
 def flash(t):                    ## W
     realT = t%period
     if (46.0 < realT <= (46+flash_time/60.)) | (47.0 < realT <= (47+flash_time/60.)) | (48.0 < realT <= (48+flash_time/60.)) :
@@ -605,7 +605,7 @@ def run_simulation(days, graphing=True):
         pyplot.show()
         
 if __name__=="__main__":
-    #default behavior
+    #default behaviour
     days = .025 ## specify number of days that the odeint should run. Keep in under 0.5 if you want reasonable run time
     run_simulation(days)
 
