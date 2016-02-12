@@ -19,9 +19,9 @@ for days in time_space:
     print("Time: " + str(now - then))
     
 plt.plot(time_space, results)
-xlabel("time in days")
-ylabel("time elapsed for simulation")
-#plt.show()    
+plt.xlabel("time in days")
+plt.ylabel("time elapsed for simulation")
+plt.show()    
 
 
 
