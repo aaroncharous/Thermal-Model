@@ -127,6 +127,8 @@ driver_weight = 0.055786          ##  guess Weight   kg
 driver_c = 950                    ##  Spec. heat capacity     J/kgK
 driver_C = driver_weight*driver_c ##  Heat capacity           J/K
 regulator_power = 0.64             ## Watts -- kind of a guess
+>>>>>>> origin/master
+>>>>>>> origin/master
 mofset_power = 68.694             ## Watts
 inductor_power = 6.655            ## Watts
 diode_power = 26                  ## Watts
@@ -191,6 +193,9 @@ phaseshift = 0                     ##  Minutes into orbit (with zero being direc
                                    ##  at 46 minutes, it would be exactly in the middle of its eclipse and back at the equator
 
 
+
+
+>>>>>>> origin/master
 ''' FUNCTIONS '''
 
 
@@ -605,6 +610,15 @@ def run_simulation(days, rtol, graphing=True):
 if __name__=="__main__":
     #default behavior
     days = .01 ## specify number of days that the odeint should run. Keep in under 0.5 if you want reasonable run time
+=======
+    #default behaviour
+    days = .5 ## specify number of days that the odeint should run. Keep in under 0.5 if you want reasonable run time
+    run_simulation(days)
+    ## specify number of days that the odeint should run. Keep in under 0.5 if you want reasonable run time
+
+    ##Test result: E-5 precision, half a day, >15min
+
+>>>>>>> origin/master
 
     #adjusting simulation accuracy to increase performance
     rtol=10**(-8) #default val is 1.5*10**(-8)
