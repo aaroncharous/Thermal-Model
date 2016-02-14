@@ -5,10 +5,10 @@ import time
 import numpy as np
 from thermal_model import run_simulation 
 
-num_times = 2
+num_times = 30
 days = 0.03 #days
 
-error_space = np.linspace(10**(-6), 10**(-3), num=num_times) 
+error_space = np.linspace(10**(-8), 10**(-4), num=num_times) 
 results = []
 for rtol in error_space:
     then = time.time()
