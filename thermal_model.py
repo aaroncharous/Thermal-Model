@@ -51,6 +51,9 @@ chassis_C = chassis_mass*alum_c    ##  Heat capacity           J/K
 chassis_thickness_f_b = 0.0065     ##  Thickness (front/back)  m
 chassis_thickness_side = 0.008     ##  Thickness (side)        m
 chassis_area = 0.009403            ##  Area                    m^2
+chassis_abs =  0.27                ## coefficient for anodized aluminum                    
+chassis_emis = 0.77                ## coefficient for anodized aluminum 
+
 
 ## Battery:
 battery_cond = 100                 ## guess Thermal conductivity W m^-1 K^-1
@@ -365,22 +368,22 @@ def dy_dt(y, t):
     #Face6 is opposite flash
     #Face2 and Face3 are top/bottom
     Led, Cell2, Cell3, Cell4, Cell5, Cell6, Face1, Face2, Face3, Face4, Face5, Face6, Chassis, Battery, Sink, Driver = y  # Unpack the vector.
-    dLed_dt = (rad21(Led, Tspace, led_abs, led_emis) * led_area +                  solar(t) * led_abs * led_area* Face1SunComponent(t) +                  albedo(t) * led_area * led_abs * Face1EarthComponent(t) +                  + flash_power_dis * flashworks(t) +                  (1./U_LedPCB) * (Face1 - Led) +                  (1./U_LedSink) * (Sink - Led))                 * 60 / led_C
-    dCell2_dt = (rad21(Cell2, Tspace, cell_abs, cell_emis) * cell_area +                  solar(t) * cell_abs * (cell_area - cell_eff * cell_area_eff) * avgFace25SunComponent(t) +                  albedo(t) * cell_area * cell_abs * avgFace25EarthComponent(t) +                  (1./U_cellPCB) * (Face2 - Cell2))                 * 60 / cell_C
-    dCell3_dt = (rad21(Cell3, Tspace, cell_abs, cell_emis) * cell_area +                  solar(t) * cell_abs * (cell_area - cell_eff * cell_area_eff) * avgFace25SunComponent(t) +                  albedo(t) * cell_area * cell_abs * avgFace25EarthComponent(t) +                  (1./U_cellPCB) * (Face3 - Cell3))                 * 60 / cell_C
-    dCell4_dt = (rad21(Cell4, Tspace, cell_abs, cell_emis) * cell_area +                  solar(t) * cell_abs * (cell_area - cell_eff * cell_area_eff) * avgFace25SunComponent(t) +                  albedo(t) * cell_area * cell_abs * avgFace25EarthComponent(t) +                  (1./U_cellPCB) * (Face4 - Cell4))                 * 60 / cell_C
-    dCell5_dt = (rad21(Cell5, Tspace, cell_abs, cell_emis) * cell_area +                  solar(t) * cell_abs * (cell_area - cell_eff * cell_area_eff) * avgFace25SunComponent(t) +                  albedo(t) * cell_area * cell_abs * avgFace25EarthComponent(t) +                  (1./U_cellPCB) * (Face5 - Cell5))                 * 60 / cell_C
-    dCell6_dt = (rad21(Cell6, Tspace, cell_abs, cell_emis) * cell_area +                  solar(t) * cell_abs * (cell_area - cell_eff * cell_area_eff) * Face6SunComponent(t) +                  albedo(t) * cell_area * cell_abs * Face6EarthComponent(t) +                  (1./U_cellPCB) * (Face6 - Cell6))                 * 60 / cell_C
-    dFace1_dt = (rad21(Face1, Tearth, PCB_abs, PCB_emis)*(PCB_area - 4*led_area) +                  solar(t) * PCB_abs * (PCB_area - led_area) * Face1SunComponent(t) +                  albedo(t) * PCB_abs * (PCB_area - led_area) * Face1EarthComponent(t) +                  4 * (1./U_LedPCB) * (Led - Face1) +                  (1./U_PCBChassis_f_b) * (Chassis - Face1))                 * 60 / PCB_sideC
-    dFace2_dt = (rad21(Face2, Tspace, PCB_abs, PCB_emis) * (PCB_area - 24. * cell_area) +                  solar(t) * PCB_abs * (PCB_area) * avgFace25SunComponent(t) +                  albedo(t) * PCB_abs * PCB_area * avgFace25EarthComponent(t) +                  24. * (1./U_cellPCB) * (Cell2 - Face2) +                  (1./U_PCBChassis_side) * (Chassis - Face2))                 * 60 / PCB_topC
-    dFace3_dt = (rad21(Face3, Tspace, PCB_abs, PCB_emis) * (PCB_area - 24. * cell_area) +                  solar(t) * PCB_abs * (PCB_area) * avgFace25SunComponent(t) +                  albedo(t) * PCB_abs * PCB_area * avgFace25EarthComponent(t) +                  24. * (1./U_cellPCB) * (Cell3 - Face3) +                  (1./U_PCBChassis_side) * (Chassis - Face3))                 * 60 / PCB_topC
-    dFace4_dt = (rad21(Face4, Tspace, PCB_abs, PCB_emis) * (PCB_area - 24. * cell_area) +                  solar(t) * PCB_abs * (PCB_area) * avgFace25SunComponent(t) +                  albedo(t) * PCB_abs * PCB_area * avgFace25EarthComponent(t) +                  24. * (1./U_cellPCB) * (Cell4 - Face4) +                  (1./U_PCBChassis_side) * (Chassis - Face4))                 * 60 / PCB_sideC
-    dFace5_dt = (rad21(Face5, Tspace, PCB_abs, PCB_emis) * (PCB_area - 24. * cell_area) +                  solar(t) * PCB_abs * (PCB_area) * avgFace25SunComponent(t) +                  albedo(t) * PCB_abs * PCB_area * avgFace25EarthComponent(t) +                  24. * (1./U_cellPCB) * (Cell5 - Face5) +                  (1./U_PCBChassis_side) * (Chassis - Face5))                 * 60 / PCB_sideC
-    dFace6_dt = (rad21(Face6, Tspace, PCB_abs, PCB_emis) * (PCB_area - 24. * cell_area) +                  solar(t) * PCB_abs * (PCB_area) * Face6SunComponent(t) +                  albedo(t) * PCB_abs * PCB_area * Face6EarthComponent(t) +                  24. * (1./U_cellPCB) * (Cell6 - Face6) +                  (1./U_PCBChassis_f_b) * (Chassis - Face6))                 * 60 / PCB_sideC
-    dChassis_dt = ((1./U_PCBChassis_f_b) * (Face1 + Face6 - 2* Chassis) +                    (1./U_PCBChassis_side) * (Face2 + Face3 + Face4 + Face5 - 4* Chassis) +                   (1./U_BatteryPlateChassis) * (Battery - Chassis) +                    (1./U_SinkChassis) * (Sink - Chassis) +                   (1./U_DriverChassis) * (Driver - Chassis))                   * 60 / chassis_C
-    dBattery_dt = (battery_power_dis * flashworks(t) +                   (1./U_BatteryPlateChassis) * (Chassis - Battery))                 * 60 / battery_C
-    dSink_dt = ((1./U_SinkChassis) * (Chassis - Sink) +                4*(1./U_LedSink) * (Led - Sink) +                (1./U_DriverSink) * (Driver - Sink)) * 60 / sink_C
-    dDriver_dt = (driver_power_dis * flashworks(t) +                  (1./U_DriverSink) * (Sink - Driver) +                  (1./U_DriverChassis) * (Chassis - Driver)) * 60 / driver_C
+    dLed_dt = (rad21(Led, Tspace, led_abs, led_emis) * led_area + solar(t) * led_abs * led_area* Face1SunComponent(t) + albedo(t) * led_area * led_abs * Face1EarthComponent(t) + flash_power_dis * flashworks(t) + (1./U_LedPCB) * (Face1 - Led) + (1./U_LedSink) * (Sink - Led))* 60 / led_C
+    dCell2_dt = (rad21(Cell2, Tspace, cell_abs, cell_emis) * cell_area + solar(t) * cell_abs * (cell_area - cell_eff * cell_area_eff) * avgFace25SunComponent(t) + albedo(t) * cell_area * cell_abs * avgFace25EarthComponent(t) + (1./U_cellPCB) * (Face2 - Cell2))* 60 / cell_C
+    dCell3_dt = (rad21(Cell3, Tspace, cell_abs, cell_emis) * cell_area + solar(t) * cell_abs * (cell_area - cell_eff * cell_area_eff) * avgFace25SunComponent(t) + albedo(t) * cell_area * cell_abs * avgFace25EarthComponent(t) + (1./U_cellPCB) * (Face3 - Cell3)) * 60 / cell_C
+    dCell4_dt = (rad21(Cell4, Tspace, cell_abs, cell_emis) * cell_area + solar(t) * cell_abs * (cell_area - cell_eff * cell_area_eff) * avgFace25SunComponent(t) + albedo(t) * cell_area * cell_abs * avgFace25EarthComponent(t) + (1./U_cellPCB) * (Face4 - Cell4)) * 60 / cell_C
+    dCell5_dt = (rad21(Cell5, Tspace, cell_abs, cell_emis) * cell_area + solar(t) * cell_abs * (cell_area - cell_eff * cell_area_eff) * avgFace25SunComponent(t) + albedo(t) * cell_area * cell_abs * avgFace25EarthComponent(t) + (1./U_cellPCB) * (Face5 - Cell5)) * 60 / cell_C
+    dCell6_dt = (rad21(Cell6, Tspace, cell_abs, cell_emis) * cell_area + solar(t) * cell_abs * (cell_area - cell_eff * cell_area_eff) * Face6SunComponent(t) + albedo(t) * cell_area * cell_abs * Face6EarthComponent(t) +  (1./U_cellPCB) * (Face6 - Cell6)) * 60 / cell_C
+    dFace1_dt = (rad21(Face1, Tearth, PCB_abs, PCB_emis)*(PCB_area - 4*led_area) + solar(t) * PCB_abs * (PCB_area - led_area) * Face1SunComponent(t) + albedo(t) * PCB_abs * (PCB_area - led_area) * Face1EarthComponent(t) + 4 * (1./U_LedPCB) * (Led - Face1) + (1./U_PCBChassis_f_b) * (Chassis - Face1)) * 60 / PCB_sideC
+    dFace2_dt = (rad21(Face2, Tspace, PCB_abs, PCB_emis) * (PCB_area - 24. * cell_area) + solar(t) * PCB_abs * (PCB_area) * avgFace25SunComponent(t) +albedo(t) * PCB_abs * PCB_area * avgFace25EarthComponent(t) + 24. * (1./U_cellPCB) * (Cell2 - Face2) + (1./U_PCBChassis_side) * (Chassis - Face2)) * 60 / PCB_topC
+    dFace3_dt = (rad21(Face3, Tspace, PCB_abs, PCB_emis) * (PCB_area - 24. * cell_area) + solar(t) * PCB_abs * (PCB_area) * avgFace25SunComponent(t) + albedo(t) * PCB_abs * PCB_area * avgFace25EarthComponent(t) + 24. * (1./U_cellPCB) * (Cell3 - Face3) + (1./U_PCBChassis_side) * (Chassis - Face3)) * 60 / PCB_topC
+    dFace4_dt = (rad21(Face4, Tspace, PCB_abs, PCB_emis) * (PCB_area - 24. * cell_area) + solar(t) * PCB_abs * (PCB_area) * avgFace25SunComponent(t) +  albedo(t) * PCB_abs * PCB_area * avgFace25EarthComponent(t) + 24. * (1./U_cellPCB) * (Cell4 - Face4) + (1./U_PCBChassis_side) * (Chassis - Face4)) * 60 / PCB_sideC
+    dFace5_dt = (rad21(Face5, Tspace, PCB_abs, PCB_emis) * (PCB_area - 24. * cell_area) + solar(t) * PCB_abs * (PCB_area) * avgFace25SunComponent(t) + albedo(t) * PCB_abs * PCB_area * avgFace25EarthComponent(t) + 24. * (1./U_cellPCB) * (Cell5 - Face5) + (1./U_PCBChassis_side) * (Chassis - Face5)) * 60 / PCB_sideC
+    dFace6_dt = (rad21(Face6, Tspace, PCB_abs, PCB_emis) * (PCB_area - 24. * cell_area) + solar(t) * PCB_abs * (PCB_area) * Face6SunComponent(t) + albedo(t) * PCB_abs * PCB_area * Face6EarthComponent(t) + 24. * (1./U_cellPCB) * (Cell6 - Face6) + (1./U_PCBChassis_f_b) * (Chassis - Face6)) * 60 / PCB_sideC
+    dChassis_dt = (rad21(Chassis, Tspace, chassis_abs, chassis_emis)*chassis_area + (1./U_PCBChassis_f_b) * (Face1 + Face6 - 2* Chassis) + (1./U_PCBChassis_side) * (Face2 + Face3 + Face4 + Face5 - 4* Chassis) +  (1./U_BatteryPlateChassis) * (Battery - Chassis) + (1./U_SinkChassis) * (Sink - Chassis) + (1./U_DriverChassis) * (Driver - Chassis)) * 60 / chassis_C
+    dBattery_dt = (battery_power_dis * flashworks(t) + (1./U_BatteryPlateChassis) * (Chassis - Battery)) * 60 / battery_C
+    dSink_dt = ((1./U_SinkChassis) * (Chassis - Sink) + 4*(1./U_LedSink) * (Led - Sink) + (1./U_DriverSink) * (Driver - Sink)) * 60 / sink_C
+    dDriver_dt = (driver_power_dis * flashworks(t) + (1./U_DriverSink) * (Sink - Driver) + (1./U_DriverChassis) * (Chassis - Driver)) * 60 / driver_C
     dydt = [dLed_dt, dCell2_dt, dCell3_dt, dCell4_dt, dCell5_dt, dCell6_dt, dFace1_dt, dFace2_dt, dFace3_dt, dFace4_dt, dFace5_dt, dFace6_dt, dChassis_dt, dBattery_dt, dSink_dt, dDriver_dt]  # Pack the answer.
     return dydt
 
@@ -457,6 +460,7 @@ def run_simulation(days, rtol, graphing=True):
         ax.plot(times, Battery, label = 'Battery')
         ax.plot(times, Sink, label = 'Sink')
         ax.plot(times, Driver, label = 'Driver')
+        ax.plot(times, Chassis, label = 'Chassis')
         ax.legend(loc = 'upper left')
         ax.set_xlabel('time / min')
         ax.set_ylabel('$T$ / K')
@@ -561,7 +565,7 @@ def run_simulation(days, rtol, graphing=True):
         
 if __name__=="__main__":
     #default behavior
-    days = .1 ## specify number of days that the odeint should run. Keep in under 0.5 if you want reasonable run time
+    days = .05 ## specify number of days that the odeint should run. Keep in under 0.5 if you want reasonable run time
     ##Test result: E-5 precision, half a day, >15min
     #adjusting simulation accuracy to increase performance
     rtol=10**(-5) #default val is 1.5*10**(-8)
