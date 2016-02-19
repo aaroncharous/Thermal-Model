@@ -1,6 +1,7 @@
 from scipy.integrate import odeint
 import numpy as np
 from matplotlib import pyplot
+import time
 
 
 ''' CONSTANTS '''
@@ -417,8 +418,11 @@ def run_simulation(days, rtol, graphing=True):
     for i in range(0, 16):
         y0s[i] = 300.           ## estimate for average psuedo steady-state temperature
     times = np.linspace(start=0., stop=24*60*days, num=24*60*days*60*20) ## (starting time, stopping time, number of increments)
+    now = time.time()
     #answer = odeint(func=dy_dt, y0=y0s, t=times) 
     answer = runconnect(days, y0s, rtol)
+    then = time.time()
+    print("Simulation of " + str(days) + " took " + str((then-now)/60) + " minutes")
     print(len(times))
     print(len(answer[:,0]))
     if len(times) < len(answer[:,0]):
