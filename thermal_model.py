@@ -1,47 +1,3 @@
-#
-# coding: utf-8
-
-# In[16]:
-
-## README ##
-
-'''
-This is a nodal thermal model for our 1U CubeSat. It uses an odeint (Ordinary Differential Equation INTegrating function)
-to obtain a numerical solution for the temperature of the various nodes as the satellite orbits. Additional nodes can be
-added in the function dy_dt(y,t). Just make sure you add them in the unpacking of the vector and the packing of the solution,
-as well as defining the actual derivative of the added node (see the way each other node is handled). Make sure that if you
-add a connection from one node to another, that the connection is in each differential equation, or suddenly energy is going
-to be vanishing from the satellite or being generated out of nowhere.
-
-As for the layout, you can see that the first section is thermal constants, segmented by what part of the system they
-pertain to. Then are the various functions (orbit, latitude, orientation, etc.) and the differential equations/solutions,
-and then the plotting/graphing section.
-
-If you have questions let me know (finnvankrieken@gmail.com)
-
-Make sure you use this in some sort of shell with iPython (python itself won't work). What I found was simplest was to
-download Anaconda Launcher which has iPython Notebook built in, and you can run a notebook locally with whatever web
-browser you want. This uses numpy, which is pretty well documented if you need other mathematical functions (just
-remember you have to enter them as np.func(x) rather than just func(x))
-
-Happy modeling!
-
-Modeling written by Finn van Krieken, Aaron Charous, and Eddie Williams
-'''
-
-
-
-'''
- TODO: 
-       Biggest: Thermal connectivity b/w pcb/chassis and cell/pcb
-
-       LEDs as node?
-       Other satellite elements as nodes (batteries, etc.) + connectivities
-       Refined connectivities for PCBs, other boards (especially Face1)
-       Update for new cells
-       Connection thermal conductivity
-'''
-
 from scipy.integrate import odeint
 import numpy as np
 from matplotlib import pyplot
@@ -605,7 +561,7 @@ def run_simulation(days, rtol, graphing=True):
         
 if __name__=="__main__":
     #default behavior
-    days = .025 ## specify number of days that the odeint should run. Keep in under 0.5 if you want reasonable run time
+    days = .1 ## specify number of days that the odeint should run. Keep in under 0.5 if you want reasonable run time
     ##Test result: E-5 precision, half a day, >15min
     #adjusting simulation accuracy to increase performance
     rtol=10**(-5) #default val is 1.5*10**(-8)
