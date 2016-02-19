@@ -21,9 +21,4 @@ for days in time_space:
 plt.plot(time_space, results)
 plt.xlabel("time in days")
 plt.ylabel("time elapsed for simulation")
-plt.show()    
-
-
-
-
-
+plt.show()

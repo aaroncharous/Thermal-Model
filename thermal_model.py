@@ -601,14 +601,14 @@ def run_simulation(days, rtol, graphing=True):
         #ax20.set_xlabel('time / min')
         #ax20.set_ylabel('$T$ / K')
         full_output = 1  ## this makes it keep running no matter how long it takes (because the odeint solver can take a bit)
-        #pyplot.show()
+        pyplot.show()
         
 if __name__=="__main__":
     #default behavior
     days = .025 ## specify number of days that the odeint should run. Keep in under 0.5 if you want reasonable run time
     ##Test result: E-5 precision, half a day, >15min
     #adjusting simulation accuracy to increase performance
-    rtol=10**(-8) #default val is 1.5*10**(-8)
+    rtol=10**(-5) #default val is 1.5*10**(-8)
 
     run_simulation(days, rtol)
 
