@@ -107,7 +107,7 @@ U_sink = sink_thickness         /(sink_area
 U_Driver_sink = driver_thickness             /(driver_area_sink *               driver_cond)
 U_Driver_chassis = driver_thickness             /(driver_area_chassis *               driver_cond)
 
-## Connections COMPLETE GUESSES RIGHT NOW Thermal Resistance   K/W
+## Connections Thermal Resistance   K/W
 U_LedPCB = U_Led + U_PCB
 U_cellPCB = U_cell + U_PCB
 U_PCBChassis_f_b = U_PCB + U_Chassis_f_b
@@ -199,7 +199,7 @@ def eclipse(t):
     
 ## betterflash: estimate of heat dissipated from flash panel
 ## Inputs: t, time in minutes
-## Output: energy dissipated by flash, flashes with 30 second interval in between when in eclipse
+## Output: energy dissipated by flash, flashes thrice with 30 second interval in between when in eclipse
 def betterflash(t):                 ## W
     eclipse_time = t%period - 29 ## time since eclipse started (assuming it is an eclipse)
     flash_period = flash_time + flash_rest ## seconds
